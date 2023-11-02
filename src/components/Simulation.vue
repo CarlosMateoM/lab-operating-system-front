@@ -8,7 +8,7 @@
                 </label>
                 <div class="border-x-2 p-4">
                     <Process v-if="queued != null" v-for="process in queued" :name="process.name" :pid="process.pid"
-                        :tr="process.TR"></Process>
+                        :tr="process.TR" :execution="process.execution" ></Process>
 
                 </div>
             </div>
@@ -19,7 +19,7 @@
 
                 <div class="border-x-2 p-4">
                     <Process v-if="execution != null" v-for="process in execution" :name="process.name" :pid="process.pid"
-                        :tr="process.TR" />
+                        :tr="process.TR" :execution="process.execution" />
                 </div>
             </div>
             <div>
@@ -28,7 +28,7 @@
                 </label>
                 <div class="border-x-2 p-4">
                     <Process v-if="finished != null" v-for="process in finished" :name="process.name" :pid="process.pid"
-                        :tr="process.TR" />
+                        :tr="process.TR" :execution="process.execution" />
                 </div>
             </div>
         </div>
@@ -66,6 +66,7 @@ function convertCatalogToProcesos(catalog) {
             ...item,
             descripcion: item.description,
             TR: item.description.length,
+            execution: 0
         };
     });
 
@@ -74,7 +75,7 @@ function convertCatalogToProcesos(catalog) {
 
 function calcularTR() {
     procesos.forEach((proceso) => {
-        proceso.TR = proceso.descripcion.length;
+        proceso.TR = proceso.name.length;
     });
     queued.value = [...procesos];
 }
@@ -95,6 +96,7 @@ function simularRoundRobin() {
                 if (queued.value.length > 0) {
                     procesoEjecucion = queued.value.shift();
                     execution.value.push(procesoEjecucion);
+                    procesoEjecucion.execution++;
                     console.log(`Proceso pid ${procesoEjecucion.pid} ha comenzado su ejecución.`);
                 } else {
                     return;
@@ -104,6 +106,7 @@ function simularRoundRobin() {
         }, th.value);
 
         const procesoActual = procesoEjecucion;
+        
 
         if (procesoActual.TR > 0) {
             console.log(`Ejecutando pid ${procesoActual.pid} ${procesoActual.TR}`);
